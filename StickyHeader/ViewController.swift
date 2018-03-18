@@ -67,6 +67,20 @@ extension ViewController: ViewModelDelegate {
             guard let sectionController = self.adapter.sectionController(for: viewModel) else { return }
             
             sectionController.collectionContext?.invalidateLayout(for: sectionController, completion: nil)
+            
+            self.adapter.visibleObjects().forEach({ (viewModel) in
+                if let viewModel = viewModel as? ViewModel {
+                    print("\(String(describing: viewModel.sectionTitle)) is visable")
+                }
+            })
+            
+            self.adapter.visibleSectionControllers().forEach({ (sectionController) in
+                if let sectionController = sectionController as? SectionController {
+                    print("\(String(describing: sectionController.viewModel?.sectionTitle)) sectionController is visable")
+                }
+            })
+            
+            
         }
     }
     

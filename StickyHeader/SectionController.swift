@@ -60,24 +60,42 @@ class SectionController: ListSectionController {
 extension SectionController: ListSupplementaryViewSource {
     
     func supportedElementKinds() -> [String] {
-        return [UICollectionElementKindSectionHeader]
+        return [UICollectionElementKindSectionHeader, UICollectionElementKindSectionFooter]
     }
     
     func viewForSupplementaryElement(ofKind elementKind: String, at index: Int) -> UICollectionReusableView {
-        guard let view = self.collectionContext?.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader,
-                                                                                  for: self,
-                                                                                  nibName: "StickyHeader",
-                                                                                  bundle: nil,
-                                                                                  at: index) else {
-            fatalError()
+        if (elementKind == UICollectionElementKindSectionHeader) {
+            guard let view = self.collectionContext?.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader,
+                                                                                      for: self,
+                                                                                      nibName: "StickyHeader",
+                                                                                      bundle: nil,
+                                                                                      at: index) else {
+                                                                                        fatalError()
+            }
+            
+            if let stickyHeader = view as? StickyHeader {
+                stickyHeader.delegate = self
+                stickyHeader.titleLabel.text = self.viewModel?.sectionTitle
+            }
+            
+            return view
+        } else if (elementKind == UICollectionElementKindSectionFooter) {
+            guard let footer = self.collectionContext?.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionFooter,
+                                                                                      for: self,
+                                                                                      nibName: "Footer", bundle:nil, at: index) else {
+                                                                                        fatalError()
+            }
+            
+            if let footer = footer as? Footer,
+                let title = self.viewModel?.sectionTitle {
+                
+                footer.titleLabel?.text = title + " Footer"
+            }
+            
+            return footer
         }
         
-        if let stickyHeader = view as? StickyHeader {
-            stickyHeader.delegate = self
-            stickyHeader.titleLabel.text = self.viewModel?.sectionTitle
-        }
-        
-        return view
+        fatalError()
     }
     
     func sizeForSupplementaryView(ofKind elementKind: String, at index: Int) -> CGSize {
