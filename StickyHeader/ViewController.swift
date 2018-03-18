@@ -7,19 +7,87 @@
 //
 
 import UIKit
+import IGListKit
 
 class ViewController: UIViewController {
-
+    
+    lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero,
+                                              collectionViewLayout: ListCollectionViewLayout(stickyHeaders: true,
+                                                                                             showHeaderWhenEmpty: true,
+                                                                                             topContentInset: 0,
+                                                                                             stretchToEdge: true))
+        collectionView.backgroundColor = .white
+        
+        return collectionView
+    }()
+    
+    lazy var adapter: ListAdapter = {
+        let adapter = ListAdapter(updater: ListAdapterUpdater(),
+                                  viewController: self)
+        adapter.dataSource = self
+        adapter.collectionView = self.collectionView
+        
+        return adapter
+    }()
+    
+    lazy var section0 = ViewModel(with: self, sectionTitle: "Section 0")
+    lazy var section1 = ViewModel(with: self, sectionTitle: "Section 1")
+    lazy var section2 = ViewModel(with: self, sectionTitle: "Section 2")
+    lazy var section3 = ViewModel(with: self, sectionTitle: "Section 3")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        self.view.addSubview(self.collectionView)
+        self.adapter.performUpdates(animated: true, completion: nil)
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .reply, target: self, action: #selector(reload))
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        self.collectionView.frame = self.view.safeAreaLayoutGuide.layoutFrame
     }
-
-
+    
+    @objc func reload() {
+        self.section0 = ViewModel(with: self, sectionTitle: "Section 0")
+        self.section1 = ViewModel(with: self, sectionTitle: "Section 1")
+        self.section2 = ViewModel(with: self, sectionTitle: "Section 2")
+        self.section3 = ViewModel(with: self, sectionTitle: "Section 3")
+        self.adapter.reloadData(completion: nil)
+    }
+    
 }
 
+extension ViewController: ViewModelDelegate {
+    
+    func dataDidChanged(_ viewModel: ViewModel) {
+        self.adapter.reloadData { (finished) in
+            guard let sectionController = self.adapter.sectionController(for: viewModel) else { return }
+            
+            sectionController.collectionContext?.invalidateLayout(for: sectionController, completion: nil)
+        }
+    }
+    
+}
+
+extension ViewController: ListAdapterDataSource {
+    
+    func objects(for listAdapter: ListAdapter) -> [ListDiffable] {
+        return [self.section0,
+                self.section1,
+                self.section2,
+                self.section3
+                ]
+    }
+    
+    func listAdapter(_ listAdapter: ListAdapter, sectionControllerFor object: Any) -> ListSectionController {
+        return SectionController()
+    }
+    
+    func emptyView(for listAdapter: ListAdapter) -> UIView? {
+        return nil
+    }
+    
+}
