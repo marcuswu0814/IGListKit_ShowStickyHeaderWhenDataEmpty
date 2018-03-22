@@ -1,2 +1,5 @@
+Using the left bar button to switch between `showHeaderWhenEmpty` mode on/off.
+And using right bar button to reset data to default.
+
 ![demo](./demo.gif)
 

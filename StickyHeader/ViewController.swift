@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     
     var showHeaderWhenEmpty = false {
         didSet {
-//            layout.showHeaderWhenEmpty = showHeaderWhenEmpty
+            layout.showHeaderWhenEmpty = showHeaderWhenEmpty
             leftBarButton?.title = "\(!showHeaderWhenEmpty)"
         }
     }
@@ -24,7 +24,7 @@ class ViewController: UIViewController {
         let layout = ListCollectionViewLayout(stickyHeaders: true,
                                               topContentInset: 0,
                                               stretchToEdge: true)
-//        layout.showHeaderWhenEmpty = self.showHeaderWhenEmpty
+        layout.showHeaderWhenEmpty = self.showHeaderWhenEmpty
         
         return layout
     }()
