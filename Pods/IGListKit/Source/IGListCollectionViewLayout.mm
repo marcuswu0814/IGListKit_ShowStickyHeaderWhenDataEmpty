@@ -150,7 +150,6 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
 @property (nonatomic, assign, readonly) BOOL stickyHeaders;
 @property (nonatomic, assign, readonly) CGFloat topContentInset;
 @property (nonatomic, assign, readonly) BOOL stretchToEdge;
-@property (nonatomic, assign, readonly) BOOL showHeaderWhenEmpty;
 
 @end
 
@@ -175,22 +174,10 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
 }
 
 - (instancetype)initWithStickyHeaders:(BOOL)stickyHeaders
-                  showHeaderWhenEmpty:(BOOL)showHeaderWhenEmpty
                       topContentInset:(CGFloat)topContentInset
                         stretchToEdge:(BOOL)stretchToEdge {
-    _showHeaderWhenEmpty = showHeaderWhenEmpty;
-    
     return [self initWithStickyHeaders:stickyHeaders
                        scrollDirection:UICollectionViewScrollDirectionVertical
-                       topContentInset:topContentInset
-                         stretchToEdge:stretchToEdge];
-}
-
-- (instancetype)initWithStickyHeaders:(BOOL)stickyHeaders
-                      topContentInset:(CGFloat)topContentInset
-                        stretchToEdge:(BOOL)stretchToEdge {
-    return [self initWithStickyHeaders:stickyHeaders
-                   showHeaderWhenEmpty:NO
                        topContentInset:topContentInset
                          stretchToEdge:stretchToEdge];
 }
@@ -258,7 +245,7 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
         const NSInteger itemCount = _sectionData[section].itemBounds.size();
 
         // do not add headers if there are no items
-        if (itemCount > 0 || self.showHeaderWhenEmpty) {
+        if (itemCount > 0) {
             for (NSString *elementKind in _supplementaryAttributesCache.allKeys) {
                 NSIndexPath *indexPath = indexPathForSection(section);
                 UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:elementKind
@@ -332,28 +319,27 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
 
     if ([elementKind isEqualToString:UICollectionElementKindSectionHeader]) {
         frame = entry.headerBounds;
-        
-
-        if (self.stickyHeaders) {
-            CGFloat offset = CGPointGetCoordinateInDirection(collectionView.contentOffset, self.scrollDirection) + self.topContentInset + self.stickyHeaderYOffset;
-
-            if (section + 1 == _sectionData.size()) {
-                offset = MAX(minOffset, offset);
-            } else {
-                const CGFloat maxOffset = CGRectGetMinInDirection(_sectionData[section + 1].bounds, self.scrollDirection) - CGRectGetLengthInDirection(frame, self.scrollDirection);
-                offset = MIN(MAX(minOffset, offset), maxOffset);
-            }
-            switch (self.scrollDirection) {
-                case UICollectionViewScrollDirectionVertical:
-                    frame.origin.y = offset;
-                    break;
-                case UICollectionViewScrollDirectionHorizontal:
-                    frame.origin.x = offset;
-                    break;
-            }
-        }
     } else if ([elementKind isEqualToString:UICollectionElementKindSectionFooter]) {
         frame = entry.footerBounds;
+    }
+
+    if (self.stickyHeaders) {
+        CGFloat offset = CGPointGetCoordinateInDirection(collectionView.contentOffset, self.scrollDirection) + self.topContentInset + self.stickyHeaderYOffset;
+
+        if (section + 1 == _sectionData.size()) {
+            offset = MAX(minOffset, offset);
+        } else {
+            const CGFloat maxOffset = CGRectGetMinInDirection(_sectionData[section + 1].bounds, self.scrollDirection) - CGRectGetLengthInDirection(frame, self.scrollDirection);
+            offset = MIN(MAX(minOffset, offset), maxOffset);
+        }
+        switch (self.scrollDirection) {
+            case UICollectionViewScrollDirectionVertical:
+                frame.origin.y = offset;
+                break;
+            case UICollectionViewScrollDirectionHorizontal:
+                frame.origin.x = offset;
+                break;
+        }
     }
 
     attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:elementKind withIndexPath:indexPath];
@@ -590,23 +576,19 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
                 rollingSectionBounds = CGRectUnion(rollingSectionBounds, frame);
             }
         }
-       
+
         const CGRect headerBounds = (self.scrollDirection == UICollectionViewScrollDirectionVertical) ?
                 CGRectMake(insets.left,
-                        (itemCount == 0) ? CGRectGetMaxY(rollingSectionBounds) : CGRectGetMinY(rollingSectionBounds) - headerSize.height,
+                        CGRectGetMinY(rollingSectionBounds) - headerSize.height,
                         paddedLengthInFixedDirection,
                         headerSize.height) :
-                CGRectMake((itemCount == 0) ? CGRectGetMaxX(rollingSectionBounds) : CGRectGetMinX(rollingSectionBounds) - headerSize.width,
+                CGRectMake(CGRectGetMinX(rollingSectionBounds) - headerSize.width,
                         insets.top,
                         headerSize.width,
                         paddedLengthInFixedDirection);
 
         _sectionData[section].headerBounds = headerBounds;
-        
-        if (itemCount == 0) {
-            rollingSectionBounds = headerBounds;
-        }
-        
+
         const CGRect footerBounds = (self.scrollDirection == UICollectionViewScrollDirectionVertical) ?
                 CGRectMake(insets.left,
                         CGRectGetMaxY(rollingSectionBounds),

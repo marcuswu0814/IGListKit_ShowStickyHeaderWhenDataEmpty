@@ -114,7 +114,7 @@ typedef NS_ENUM(NSInteger, IGListDiffingSectionState) {
     self.object = object;
 
     if (oldObject == nil) {
-        self.viewModels = [[self.dataSource sectionController:self viewModelsForObject:object] copy];
+        self.viewModels = [self.dataSource sectionController:self viewModelsForObject:object];
     } else {
         IGAssert([oldObject isEqualToDiffableObject:object],
                  @"Unequal objects %@ and %@ will cause IGListBindingSectionController to reload the entire section",

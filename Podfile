@@ -7,6 +7,8 @@ target 'StickyHeader' do
 
   # Pods for StickyHeader
 
-  pod 'IGListKit', :git => 'https://github.com/marcuswu0814/IGListKit', :branch => 'feature/showHeaderWhenSectionItemEmpty'
-
+  # pod 'IGListKit', :git => 'https://github.com/marcuswu0814/IGListKit', :branch => 'feature/showHeaderWhenSectionItemEmpty'
+  # pod 'IGListKit', :git => 'https://github.com/Instagram/IGListKit', :branch => 'master'
+  # pod 'IGListKit', :path => '../IGListKit'
+  pod 'IGListKit'
 end
