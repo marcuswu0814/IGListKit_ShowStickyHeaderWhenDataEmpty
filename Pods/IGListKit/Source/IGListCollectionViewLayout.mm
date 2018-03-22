@@ -245,7 +245,7 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
         const NSInteger itemCount = _sectionData[section].itemBounds.size();
 
         // do not add headers if there are no items
-        if (itemCount > 0) {
+        if (itemCount > 0 || self.showHeaderWhenEmpty) {
             for (NSString *elementKind in _supplementaryAttributesCache.allKeys) {
                 NSIndexPath *indexPath = indexPathForSection(section);
                 UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:elementKind
@@ -319,7 +319,6 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
 
     if ([elementKind isEqualToString:UICollectionElementKindSectionHeader]) {
         frame = entry.headerBounds;
-        
 
         if (self.stickyHeaders) {
             CGFloat offset = CGPointGetCoordinateInDirection(collectionView.contentOffset, self.scrollDirection) + self.topContentInset + self.stickyHeaderYOffset;
@@ -433,6 +432,14 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
 
 #pragma mark - Public API
 
+- (void)setShowHeaderWhenEmpty:(BOOL)showHeaderWhenEmpty {
+    IGAssertMainThread();
+    
+    if (_showHeaderWhenEmpty != showHeaderWhenEmpty) {
+        _showHeaderWhenEmpty = showHeaderWhenEmpty;
+    }
+}
+
 - (void)setStickyHeaderYOffset:(CGFloat)stickyHeaderYOffset {
     IGAssertMainThread();
 
@@ -484,6 +491,7 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
 
     for (NSInteger section = _minimumInvalidatedSection; section < sectionCount; section++) {
         const NSInteger itemCount = [dataSource collectionView:collectionView numberOfItemsInSection:section];
+        const BOOL itemsEmpty = itemCount == 0;
         _sectionData[section].itemBounds = std::vector<CGRect>(itemCount);
 
         const CGSize headerSize = [delegate collectionView:collectionView layout:self referenceSizeForHeaderInSection:section];
@@ -577,19 +585,23 @@ static void adjustZIndexForAttributes(UICollectionViewLayoutAttributes *attribut
                 rollingSectionBounds = CGRectUnion(rollingSectionBounds, frame);
             }
         }
-
+       
         const CGRect headerBounds = (self.scrollDirection == UICollectionViewScrollDirectionVertical) ?
                 CGRectMake(insets.left,
-                        CGRectGetMinY(rollingSectionBounds) - headerSize.height,
+                        (itemsEmpty && self.showHeaderWhenEmpty) ? CGRectGetMaxY(rollingSectionBounds) : CGRectGetMinY(rollingSectionBounds) - headerSize.height,
                         paddedLengthInFixedDirection,
                         headerSize.height) :
-                CGRectMake(CGRectGetMinX(rollingSectionBounds) - headerSize.width,
+                CGRectMake((itemsEmpty && self.showHeaderWhenEmpty) ? CGRectGetMaxX(rollingSectionBounds) : CGRectGetMinX(rollingSectionBounds) - headerSize.width,
                         insets.top,
                         headerSize.width,
                         paddedLengthInFixedDirection);
 
         _sectionData[section].headerBounds = headerBounds;
-
+        
+        if (itemsEmpty && self.showHeaderWhenEmpty) {
+            rollingSectionBounds = headerBounds;
+        }
+        
         const CGRect footerBounds = (self.scrollDirection == UICollectionViewScrollDirectionVertical) ?
                 CGRectMake(insets.left,
                         CGRectGetMaxY(rollingSectionBounds),

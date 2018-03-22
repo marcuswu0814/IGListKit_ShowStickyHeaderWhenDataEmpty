@@ -6,21 +6,21 @@ PODS:
   - IGListKit/Diffing (3.2.0)
 
 DEPENDENCIES:
-  - IGListKit (from `https://github.com/Instagram/IGListKit`, branch `master`)
+  - IGListKit (from `https://github.com/marcuswu0814/IGListKit`, branch `feature/showHeaderWhenSectionItemEmpty`)
 
 EXTERNAL SOURCES:
   IGListKit:
-    :branch: master
-    :git: https://github.com/Instagram/IGListKit
+    :branch: feature/showHeaderWhenSectionItemEmpty
+    :git: https://github.com/marcuswu0814/IGListKit
 
 CHECKOUT OPTIONS:
   IGListKit:
-    :commit: df18195d18f60f4e3b46ed120991a83e9a58dcc7
-    :git: https://github.com/Instagram/IGListKit
+    :commit: 149351d32496880bb70a7051b5ca522744c17862
+    :git: https://github.com/marcuswu0814/IGListKit
 
 SPEC CHECKSUMS:
   IGListKit: ffe6f98a728ab0250aceea22e7957aa5477c5048
 
-PODFILE CHECKSUM: 568c871039f9cacd5785974601eb1ca367907e14
+PODFILE CHECKSUM: 4a72f179855df7a36edf89599b84e6d38d2314a7
 
 COCOAPODS: 1.4.0
