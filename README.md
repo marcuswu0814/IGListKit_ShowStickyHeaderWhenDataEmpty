@@ -3,3 +3,6 @@ And using right bar button to reset data to default.
 
 ![demo](./demo.gif)
 
+If set `showHeaderWhenEmpty` to `false`, the header got wrong. 
+
+![bug](./bug.gif)
