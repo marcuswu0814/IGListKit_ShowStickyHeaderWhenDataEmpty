@@ -13,18 +13,10 @@ class ViewController: UIViewController {
     
     var leftBarButton: UIBarButtonItem?
     
-    var showHeaderWhenEmpty = false {
-        didSet {
-//            layout.showHeaderWhenEmpty = showHeaderWhenEmpty
-            leftBarButton?.title = "\(!showHeaderWhenEmpty)"
-        }
-    }
-    
     lazy var layout: ListCollectionViewLayout = {
         let layout = ListCollectionViewLayout(stickyHeaders: true,
                                               topContentInset: 0,
                                               stretchToEdge: true)
-//        layout.showHeaderWhenEmpty = self.showHeaderWhenEmpty
         
         return layout
     }()
@@ -58,18 +50,12 @@ class ViewController: UIViewController {
         self.view.addSubview(self.collectionView)
         self.adapter.performUpdates(animated: true, completion: nil)
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .reply, target: self, action: #selector(reload))
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "\(!showHeaderWhenEmpty)", style: .plain, target: self, action: #selector(modifiedShowHeaderWhenEmpty))
-        leftBarButton = self.navigationItem.leftBarButtonItem
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         self.collectionView.frame = self.view.safeAreaLayoutGuide.layoutFrame
-    }
-    
-    @objc func modifiedShowHeaderWhenEmpty() {
-        showHeaderWhenEmpty = !showHeaderWhenEmpty
     }
     
     @objc func reload() {
