@@ -114,7 +114,6 @@ extension ViewController: ListAdapterDataSource {
         return [self.section0,
                 self.section1,
                 self.section2,
-//                self.section3
                 ]
     }
     
@@ -123,7 +122,9 @@ extension ViewController: ListAdapterDataSource {
     }
     
     func emptyView(for listAdapter: ListAdapter) -> UIView? {
-        return nil
+        let view = UIView()
+        view.backgroundColor = .red
+        return view
     }
     
 }
